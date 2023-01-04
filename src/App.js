@@ -1,12 +1,10 @@
 import React from 'react';
-import Login from './components/Login';
+import Router from './router';
 import './Global.css';
 
 
-function App() {
+export default function App() {
   return(
-    <Login />
+    <Router />
   );
 }
-
-export default App;
