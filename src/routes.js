@@ -4,7 +4,7 @@ import Login from './components/Login';
 import Alunos from './components/Alunos';
 import NovoAluno from './components/NovoAluno';
 
-export default function Router() {
+export default function Routes() {
     return(
         <BrowserRouter>
             <Switch>

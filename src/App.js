@@ -1,10 +1,10 @@
 import React from 'react';
-import Router from './router';
+import Routes from './routes';
 import './Global.css';
 
 
 export default function App() {
   return(
-    <Router />
+    <Routes />
   );
 }
