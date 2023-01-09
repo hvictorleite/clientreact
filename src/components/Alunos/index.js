@@ -8,8 +8,11 @@ import api from '../../services/api';
 
 export default function Alunos() {
 
+    // filtrar dados
+    const [searchInput, setSearchInput] = useState('');
+    const [filtro, setFiltro] = useState([]);
+
     const [alunos, setAlunos] = useState([]);
-    //    const [nome, setNome] = useState('');
 
     const email = localStorage.getItem('email');
     const token = localStorage.getItem('token');
@@ -21,6 +24,19 @@ export default function Alunos() {
     };
 
     const navigate = useNavigate();
+
+    const searchAlunos = (searchValue) => {
+        setSearchInput(searchValue);
+        if(searchInput !== ''){
+            const dadosFiltrados = alunos.filter((item) => {
+                return Object.values(item).join('').toLowerCase().includes(searchInput.toLowerCase());
+            });
+            setFiltro(dadosFiltrados);
+        }
+        else {
+            setFiltro(alunos);
+        }
+    }
 
     useEffect(() => {
         api.get('api/alunos', authorization).then(
@@ -49,6 +65,17 @@ export default function Alunos() {
         }
     }
 
+    async function deleteAluno(id) {
+        try {
+            if(window.confirm('Deseja deletar o aluno de id = ' + id + ' ?')){
+                await api.delete(`api/alunos/${id}`, authorization);
+                setAlunos(alunos.filter(aluno => aluno.id !== id));
+            }
+        } catch(error) {
+            alert('Não foi possível remover o aluno');
+        }
+    }
+
     return (
         <div className="aluno-container">
             <header>
@@ -60,12 +87,26 @@ export default function Alunos() {
                 </button>
             </header>
             <form>
-                <input type="text" placeholder="Nome" />
-                <button type="button" className="button">
-                    Filtrar aluno por nome (parcial)
-                </button>
+                <input type="text" placeholder="Filtrar por nome..." onChange={(e) => searchAlunos(e.target.value)} />
             </form>
             <h1>Relação de Alunos</h1>
+            {searchInput.length > 0 ? (
+            <ul>
+                {filtro.map(aluno => (
+                    <li key={aluno.id}>
+                        <b>Nome: </b>{aluno.nome}<br /><br />
+                        <b>Email: </b>{aluno.email}<br /><br />
+                        <b>Idade: </b>{aluno.idade}<br /><br />
+                        <button type="button" onClick={() => editAluno(aluno.id)}>
+                            <FiEdit size={25} color="#17202a" />
+                        </button>
+                        <button type="button" onClick={() => deleteAluno(aluno.id)} >
+                            <FiUserX size={25} color="#17202a" />
+                        </button>
+                    </li>
+                ))}
+            </ul>
+            ) : (
             <ul>
                 {alunos.map(aluno => (
                     <li key={aluno.id}>
@@ -75,12 +116,13 @@ export default function Alunos() {
                         <button type="button" onClick={() => editAluno(aluno.id)}>
                             <FiEdit size={25} color="#17202a" />
                         </button>
-                        <button type="button" >
+                        <button type="button" onClick={() => deleteAluno(aluno.id)}>
                             <FiUserX size={25} color="#17202a" />
                         </button>
                     </li>
                 ))}
             </ul>
+            )}
         </div>
     );
 }
